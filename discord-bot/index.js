@@ -1,10 +1,14 @@
-const { Client, Intents } = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
 require("dotenv").config();
 
 const client = new Client({
   intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.DirectMessages,
+    // Intents.FLAGS.GUILDS,
+    // Intents.FLAGS.GUILD_MESSAGES,
     // Add more intents as needed, Empty array here after trial
   ],
 });
@@ -14,13 +18,14 @@ client.once("ready", () => {
 });
 
 // Message event listener
-client.on("messageCreate", (message) => {
-  // Ignore messages from bots to prevent infinite loops
-  if (message.author.bot) return;
-
-  // Your message handling code goes here
-  if (message.content.toLowerCase() === "ping") {
-    message.reply("Pong!");
+client.on("messageCreate", async (message) => {
+  if (!message.author.bot) {
+    try {
+      const dmChannel = await message.author.createDM();
+      dmChannel.send(`Echo ${message.content}`);
+    } catch (error) {
+      console.error("Error sending DM:", error);
+    }
   }
 });
 
